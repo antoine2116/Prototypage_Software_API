@@ -8,6 +8,7 @@ var mqtt = require('mqtt')
 var logger = require('morgan');
 var methodOverride = require('method-override');
 var session = require('express-session');
+const cors = require("cors");
 var bodyParser = require('body-parser');
 var multer = require('multer');
 var errorHandler = require('errorhandler');
@@ -50,6 +51,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+
+// set up cors
+var corsOptions = {
+    origin: 'http://localhost:8080'
+};
+app.use(cors(corsOptions));
 
 app.use(multer());
 app.use(express.static(path.join(__dirname, 'public')));
