@@ -13,7 +13,8 @@ var multer = require('multer');
 var errorHandler = require('errorhandler');
 
 // Controllers
-var controller = require('./controller');
+var releves_controller = require('./controllers/releves_controller');
+var auth_controller = require('./controllers/authentification_controller')
 
 // MongoClient
 const MongoClient = require('mongodb').MongoClient;
@@ -89,15 +90,22 @@ clientMqtt.on('message', (topic, message) => {
     }
 
     if ('temperature' in releve && 'humidity' in releve && 'brightness' in releve) {
-        controller.addReleve(releve, db.collection('releves'));
+        releves_controller.addReleve(releve, db.collection('releves'));
         releve = {};
     }
 });
 
-// Routes
-app.get('/lastReleve', controller.getLastReleve);
-app.get('/allReleves', controller.getAllReleve);
-app.get('/addReleve', controller.addReleve);
+// ---------------- Routes --------------------
+
+// Authentification
+app.get('/login', auth_controller.login);
+
+// Releves
+app.get('/lastReleve', releves_controller.getLastReleve);
+app.get('/allReleves', releves_controller.getAllReleve);
+app.get('/addReleve', releves_controller.addReleve);
+
+
 
 app.listen(app.get('port'), function() {
     console.log('Express server listening on port ' + app.get('port'));
