@@ -1,24 +1,19 @@
+const util = require('util');
+
 // Récupère le dernier relevé
 exports.getLastReleve = (req, res) => {
     let db = req.db;
     let collection = db.collection('releves');
 
-    collection.find().sort({"created_on": -1}).limit(1).toArray(function(err, releve) {
-        if (releve.length) {
-            // TODO min/max brightness
-            let data = {
-                date: releve[0].created_on,
-                temperature: releve[0].temperature,
-                humidity: releve[0].humidity
-            }
-            res.send(data);
+    collection.find().sort({"date": -1}).limit(1).toArray(function(err, result) {
+        if (result.length) {
+            res.send(result[0]);
         } else {
             console.log(err.message);
             res.status(500).send({message: 'Une erreur est survenue lors de la récupération du relevé'});
         }
     });
 }
-
 
 // Récupère tout les relevés des 6 dernières heures
 exports.getAllReleve = (req, res) => {
@@ -29,7 +24,7 @@ exports.getAllReleve = (req, res) => {
     dateMax.setHours(dateMax.getHours() - 6);
 
     collection.find({
-        created_on: {
+        date: {
             $gt: dateMax
         }
     }).toArray(function(err, releves) {
@@ -37,34 +32,29 @@ exports.getAllReleve = (req, res) => {
             console.log(err.message);
             res.status(500).send({message: 'Une erreur est survenue lors de la récupération des relevés'});
         } else {
-            // TODO min/max brightness
             let data = {
-                date_arr: releves.map(r => r.created_on),
-                temperature_arr: releves.map(r => r.temperature),
-                humidity_arr: releves.map(r => r.humidity)
+                date_arr: releves.map(r => r.date),
+                temperature_arr: releves.map(r => r.temperature.value),
+                humidity_arr: releves.map(r => r.humidity.value),
+                brightness_arr: releves.map(r => r.brightness.value)
             };
             res.send(data);
         }
     });
 }
 
-// Temporaire (ajoute un releve random)
-exports.addReleve = (req, res) => {
-    let db = req.db;
-    let collection = db.collection('releves');
-
+// Ajoute un relevé en base
+exports.addReleve = (releve, collection) => {
     collection.insertOne({
-        temperature: Math.floor(Math.random() * 20) + 30,
-        humidity: Math.floor(Math.random() * 30) + 10,
-        brightness: Math.floor(Math.random() * 100) + 200,
-        created_on: new Date()
-    }, function(error, result) {
-        if (error) {
+        temperature: releve.temperature,
+        humidity: releve.humidity,
+        brightness: releve.brightness,
+        date: new Date()
+    }, function(err, result) {
+        if (err) {
             console.log(err.message);
-            res.status(500).send({message: 'Une erreur est survenue lors de la récupération des relevés'});
         } else {
-            console.log(result);
-            res.status(200).send();
+            console.log('Payload inserted : ' + util.inspect(releve) + '\n');
         }
     });
 }
