@@ -11,6 +11,7 @@ exports.login = (req, res) => {
     collection.findOne({email: email}, (err, user) => {
        if (user != null) {
            data.user = user;
+           data.status = true;
        }
        res.send(data);
     });

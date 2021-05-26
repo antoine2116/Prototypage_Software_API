@@ -35,6 +35,8 @@ MongoClient.connect('mongodb://127.0.0.1:27017/nostomates', function(err, databa
 
 app.use(function(req, res, next) {
     req.db = db;
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
 
@@ -54,8 +56,9 @@ app.use(bodyParser.urlencoded({
 
 // set up cors
 var corsOptions = {
-    origin: 'http://localhost:8080'
+    origin: '*'
 };
+
 app.use(cors(corsOptions));
 
 app.use(multer());
