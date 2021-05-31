@@ -20,14 +20,7 @@ exports.getAllReleve = (req, res) => {
     let db = req.db;
     let collection = db.collection('releves');
 
-    let dateMax = new Date();
-    dateMax.setHours(dateMax.getHours() - 6);
-
-    collection.find({
-        date: {
-            $gt: dateMax
-        }
-    }).toArray(function(err, releves) {
+    collection.find().sort({date: -1}).limit(50).toArray(function(err, releves) {
         if (err) {
             console.log(err.message);
             res.status(500).send({message: 'Une erreur est survenue lors de la récupération des relevés'});

@@ -41,7 +41,7 @@ app.use(function(req, res, next) {
 });
 
 
-app.set('port', process.env.PORT || 8080);
+app.set('port', process.env.PORT || 8081);
 app.use(logger('dev'));
 app.use(methodOverride());
 app.use(session({
@@ -77,10 +77,10 @@ clientMqtt.on("error",function(error) {
     console.log("Can't connect to mqtt broker : " + error);
 });
 
-// Mqtt Subscriptions5485
-clientMqtt.subscribe('EPSI/DHT11/zebi/temperature');
-clientMqtt.subscribe('EPSI/DHT11/zebi/humidity');
-clientMqtt.subscribe('EPSI/GL5516/zebi/brightness');
+// Mqtt Subscriptions
+clientMqtt.subscribe('EPSI/DHT11/5C:CF:7F:B8:C4:75/TEMP');
+clientMqtt.subscribe('EPSI/DHT11/5C:CF:7F:B8:C4:75/HUM');
+clientMqtt.subscribe('EPSI/GL5516/5C:CF:7F:B8:C4:75');
 
 // Manage recieved messages
 let releve = {};
@@ -88,14 +88,14 @@ let releve = {};
 clientMqtt.on('message', (topic, message) => {
     console.log(`****  MQTT payload recieved at ${(new Date().toLocaleTimeString())} Topic : ${topic}  *****`);
 
-    let payload = JSON.parse(message.toString('binary'));
+    let payload = JSON.parse(message.toString());
 
-    if (topic.includes('temperature')) {
+    if (topic.includes('TEMP')) {
         releve.temperature = payload;
-    } else if (topic.includes('humidity')) {
+    } else if (topic.includes('HUM')) {
         releve.humidity = payload;
 
-    } else if (topic.includes('brightness')) {
+    } else if (topic.includes('GL5516')) {
         releve.brightness = payload;
     }
 
@@ -103,6 +103,7 @@ clientMqtt.on('message', (topic, message) => {
         releves_controller.addReleve(releve, db.collection('releves'));
         releve = {};
     }
+    console.log(releve);
 });
 
 // ---------------- Routes --------------------
