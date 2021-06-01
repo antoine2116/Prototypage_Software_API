@@ -70,7 +70,7 @@ app.use(errorHandler());
 let clientMqtt = mqtt.connect('mqtt://broker.hivemq.com', {  clientId: 'antoinelebg' });
 
 clientMqtt.on('connect', function() {
-    console.log('Connected to mqtt broker !');
+    console.log('Waiting for mqtt...');
 });
 
 clientMqtt.on("error",function(error) {
@@ -81,6 +81,7 @@ clientMqtt.on("error",function(error) {
 clientMqtt.subscribe('EPSI/DHT11/5C:CF:7F:B8:C4:75/TEMP');
 clientMqtt.subscribe('EPSI/DHT11/5C:CF:7F:B8:C4:75/HUM');
 clientMqtt.subscribe('EPSI/GL5516/5C:CF:7F:B8:C4:75');
+clientMqtt.subscribe('EPSI/SR501/5C:CF:7F:B8:C4:75');
 
 // Manage recieved messages
 let releve = {};
@@ -94,12 +95,13 @@ clientMqtt.on('message', (topic, message) => {
         releve.temperature = payload;
     } else if (topic.includes('HUM')) {
         releve.humidity = payload;
-
     } else if (topic.includes('GL5516')) {
         releve.brightness = payload;
+    } else if (topic.includes('SR501')) {
+        releve.movement = payload;
     }
 
-    if ('temperature' in releve && 'humidity' in releve && 'brightness' in releve) {
+    if ('temperature' in releve && 'humidity' in releve && 'brightness' in releve && 'movement' in releve) {
         releves_controller.addReleve(releve, db.collection('releves'));
         releve = {};
     }

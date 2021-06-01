@@ -29,7 +29,8 @@ exports.getAllReleve = (req, res) => {
                 date_arr: releves.map(r => r.date),
                 temperature_arr: releves.map(r => r.temperature.value),
                 humidity_arr: releves.map(r => r.humidity.value),
-                brightness_arr: releves.map(r => r.brightness.value)
+                brightness_arr: releves.map(r => r.brightness.value),
+                movements_arr: releves.map(r => r.movement.value)
             };
             res.send(data);
         }
@@ -42,6 +43,7 @@ exports.addReleve = (releve, collection) => {
         temperature: releve.temperature,
         humidity: releve.humidity,
         brightness: releve.brightness,
+        movement: releve.movement,
         date: new Date()
     }, function(err, result) {
         if (err) {
