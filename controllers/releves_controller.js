@@ -6,11 +6,30 @@ exports.getLastReleve = (req, res) => {
     let collection = db.collection('releves');
 
     collection.find().sort({"date": -1}).limit(1).toArray(function(err, result) {
-        if (result.length) {
-            res.send(result[0]);
-        } else {
+        if (err) {
             console.log(err.message);
-            res.status(500).send({message: 'Une erreur est survenue lors de la récupération du relevé'});
+            res.status(500).send({message: err.message});
+        }
+
+        if (result.length) {
+            const lastReleve = result[0];
+            const query = {'movement.value' : {$eq: 1}};
+            collection.find(query).sort({date: -1}).limit(1).toArray(function(err, lastMovement) {
+                if (err) {
+                    res.status(500).send({message: err.message});
+                }
+                console.log(lastMovement)
+                if (lastMovement.length) {
+                    lastReleve.lastMovement = lastMovement[0].date
+                } else {
+                    lastReleve.lastMovement = ''
+                }
+
+                res.json(lastReleve);
+
+            });
+        } else {
+            res.status(500).send({message: 'Aucun relevé trouvé'});
         }
     });
 }
@@ -29,8 +48,7 @@ exports.getAllReleve = (req, res) => {
                 date_arr: releves.map(r => r.date),
                 temperature_arr: releves.map(r => r.temperature.value),
                 humidity_arr: releves.map(r => r.humidity.value),
-                brightness_arr: releves.map(r => r.brightness.value),
-                movements_arr: releves.map(r => r.movement.value)
+                brightness_arr: releves.map(r => r.brightness.value)
             };
             res.send(data);
         }

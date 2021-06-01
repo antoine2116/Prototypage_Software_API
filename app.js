@@ -116,7 +116,6 @@ app.get('/login', auth_controller.login);
 // Releves
 app.get('/lastReleve', releves_controller.getLastReleve);
 app.get('/allReleves', releves_controller.getAllReleve);
-app.get('/addReleve', releves_controller.addReleve);
 
 
 
