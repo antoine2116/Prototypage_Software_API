@@ -67,7 +67,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(errorHandler());
 
 // Mqtt connection
-let clientMqtt = mqtt.connect('mqtt://broker.hivemq.com', {  clientId: 'antoinelebg' });
+let clientMqtt = mqtt.connect('mqtt://broker.hivemq.com', {  clientId: 'gf9a3Iidg31' });
 
 clientMqtt.on('connect', function() {
     console.log('Waiting for mqtt...');
